@@ -56,7 +56,9 @@ YOUR ANSWER HERE
 Describe how you will attempt to simulate orbital motion.
 
 The orbs will move towards the center of mass located below the screen. 
-Formula: 
+
+Formula: ${\overrightarrow F} = G \dfrac{mass_A mass_B}{r^2}\hat{AB}$
+
 
 --- 
 
@@ -64,7 +66,8 @@ Formula:
 Describe what your spring simulation will look like. Explain how it will be setup, and how it should behave while running.
 
 Orbs will be connected via spring. If the spring is compressed, the orbs will experience a formula directing them away from each other, and vice versa. 
-Formula: F = kx
+
+Formula: ${\overrightarrow F} = k x \hat {AB}$
 
 --- 
 
@@ -72,7 +75,8 @@ Formula: F = kx
 Describe what your drag simulation will look like. Explain how it will be setup, and how it should behave while running.
 
 A force that opposes motion, depending on the object's velocity and medium of surrounding. 
-Formula: $$ {\overrightarrow F} = -\dfrac{1}{2} ||v||^2 C_d {\hat v} $$
+
+Formula: ${\overrightarrow F} = -\dfrac{1}{2} ||v||^2 C_d {\hat v}$
 
 --- 
 
