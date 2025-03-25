@@ -49,7 +49,7 @@ Formula: ${{\overrightarrow F} = k  \dfrac {q_1 q_2} {r^2}}$
   - Yes, it will be repelled or attracted depending on the sign of the electrostatic force. 
 
 - In order to calculate this force, do you need to perform extra intermediary calculations? If so, what?
-  - Yes, F = k * |q1 * q2| / r^2
+  - Yes, ${{\overrightarrow F} = k  \dfrac {q_1 q_2} {r^2}}$
 
 --- 
 
@@ -58,7 +58,7 @@ Describe how you will attempt to simulate orbital motion.
 
 The orbs will move towards the center of mass located below the screen. 
 
-Formula: ${\overrightarrow F} = G \dfrac{mass_A mass_B}{r^2}\hat{AB}$
+Formula: ${{\overrightarrow F} = G \dfrac{mass_A mass_B}{r^2}\hat{AB}}$
 
 
 --- 
@@ -68,7 +68,7 @@ Describe what your spring simulation will look like. Explain how it will be setu
 
 Orbs will be connected via spring. If the spring is compressed, the orbs will experience a formula directing them away from each other, and vice versa. 
 
-Formula: ${\overrightarrow F} = k x \hat {AB}$
+Formula: ${{\overrightarrow F} = k x \hat {AB}}$
 
 --- 
 
@@ -77,7 +77,7 @@ Describe what your drag simulation will look like. Explain how it will be setup,
 
 A force that opposes motion, depending on the object's velocity and medium of surrounding. 
 
-Formula: ${\overrightarrow F} = -\dfrac{1}{2} ||v||^2 C_d {\hat v}$
+Formula: ${{\overrightarrow F} = -\dfrac{1}{2} ||v||^2 C_d {\hat v}}$
 
 --- 
 
