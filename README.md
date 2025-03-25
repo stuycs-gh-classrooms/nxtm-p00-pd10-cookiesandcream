@@ -84,12 +84,14 @@ Formula: ${{\overrightarrow F} = -\dfrac{1}{2} ||v||^2 C_d {\hat v}}$
 ### Simulation 4: Custom force
 Describe what your Custom force simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-YOUR ANSWER HERE
+Orbs will be repelled or attracted depending on the sign of the electrostatic force. The magnitude of the force will be determined by the magnitude of the charges. 
+
+Formula: ${{\overrightarrow F} = k  \dfrac {q_1 q_2} {r^2}}$
 
 --- 
 
 ### Simulation 5: Combination
 Describe what your combination simulation will look like. Explain how it will be setup, and how it should behave while running.
 
-YOUR ANSWER HERE
+Orbs will be attracted to the bottem of the screen while moving toward or away from each other base on their charges. 
 
