@@ -6,6 +6,7 @@ float MAX_MASS = 100;
 float G_CONSTANT = 1;
 float K_CONSTANT = 1;
 float D_COEF = 0.1;
+float V_INITIAL = 5;
 
 int SPRING_LENGTH = 50;
 float  SPRING_K = 0.005;
@@ -22,24 +23,18 @@ boolean[] toggles = new boolean[7];
 String[] modes = {"Moving", "Gravity", "Spring", "Drag", "Electrostatic",
   "Combination", "Bounce"};
 
-FixedOrb earth;
+FixedOrb star;
+Orb[] orbs;
 OrbNode o0, o1, o2;
 
 
 void setup()
 {
   size(600, 600);
+  orbs = new Orb[NUM_ORBS];
 
-  earth = new FixedOrb(width/2, height * 200, 1, 20000);
-
-  o0 = new OrbNode();
-  o1 = new OrbNode();
-  o2 = new OrbNode();
-
-  o0.next = o1;
-  o1.previous = o0;
-  o1.next = o2;
-  o2.previous = o1;
+  //Simulations
+  gravitySetup(V_INITIAL);
 }//setup
 
 
@@ -48,6 +43,14 @@ void draw()
   background(255);
   displayMode();
 
+  //Array
+  for (int i = 0; i < orbs.length; i++) {
+    orbs[i].display();
+  }
+  
+  gravitySim();
+
+  //Linked list
   OrbNode currentNode = o0;
   while (currentNode != null) {
     currentNode.display(SPRING_LENGTH);
@@ -60,9 +63,6 @@ void draw()
     currentNode = currentNode.next;
   }
 }//draw
-
-
-
 
 
 void keyPressed()
@@ -113,4 +113,33 @@ void displayMode()
     text(modes[m], x+2, 2);
     x+= w+5;
   }
-}//display
+}//displayMode
+
+void gravitySetup(float v) {
+  star = new FixedOrb(width/2, height/2, 200, 100);
+  orbs[0] = star;
+
+  //populate
+  for (int i = 1; i < orbs.length; i++) {
+    orbs[i] = new Orb();
+  }
+
+  for (int i = 1; i < orbs.length; i++) {
+    float deg = random(0, 360);
+    float vx =  v * cos(radians(deg));
+    float vy = v * cos(radians(deg));
+    PVector vel = new PVector(vx, vy);
+    orbs[i].velocity = vel;
+  }
+}//gravitySetup
+
+void gravitySim() {
+  for (int i = 1; i < orbs.length; i++) {
+    PVector gf = orbs[i].getGravity(star, G_CONSTANT);
+    orbs[i].applyForce(gf);
+  }
+
+  for (int i = 1; i < orbs.length; i++) {
+    orbs[i].move(toggles[BOUNCE]);
+  }
+}//gravitySim
