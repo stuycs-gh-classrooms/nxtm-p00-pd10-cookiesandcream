@@ -4,18 +4,23 @@ int MAX_SIZE = 60;
 float MIN_MASS = 10;
 float MAX_MASS = 100;
 float G_CONSTANT = 1;
-float C_CONSTANT = 1;
+float K_CONSTANT = 1;
 float D_COEF = 0.1;
 
 int SPRING_LENGTH = 50;
 float  SPRING_K = 0.005;
 
 int MOVING = 0;
-int BOUNCE = 1;
-int GRAVITY = 2;
+int GRAVITY = 1;
+int SPRING = 2;
 int DRAGF = 3;
-boolean[] toggles = new boolean[4];
-String[] modes = {"Moving", "Bounce", "Gravity", "Drag"};
+int ELECTROSTATIC = 4;
+int COMBINATION = 5;
+int BOUNCE = 6;
+
+boolean[] toggles = new boolean[7];
+String[] modes = {"Moving", "Gravity", "Spring", "Drag", "Electrostatic",
+  "Combination", "Bounce"};
 
 FixedOrb earth;
 OrbNode o0, o1, o2;
@@ -45,19 +50,13 @@ void draw()
 
   OrbNode currentNode = o0;
   while (currentNode != null) {
-    currentNode.display(SPRING_LENGTH);  
+    currentNode.display(SPRING_LENGTH);
     currentNode = currentNode.next;
   }
 
   currentNode = o0;
   while (currentNode != null) {
-    currentNode.applySprings(SPRING_LENGTH, SPRING_K); 
-    currentNode = currentNode.next;
-  }
-
-  currentNode = o0;
-  while (currentNode != null) {
-    currentNode.move(toggles[BOUNCE]);
+    currentNode.applySprings(SPRING_LENGTH, SPRING_K);
     currentNode = currentNode.next;
   }
 }//draw
@@ -71,16 +70,25 @@ void keyPressed()
   if (key == ' ') {
     toggles[MOVING] = !toggles[MOVING];
   }
-  if (key == 'g') {
-    toggles[GRAVITY] = !toggles[GRAVITY];
-  }
   if (key == 'b') {
     toggles[BOUNCE] = !toggles[BOUNCE];
   }
-  if (key == 'd') {
+  if (key == '1') {
+    toggles[GRAVITY] = !toggles[GRAVITY];
+  }
+  if (key == '2') {
+    toggles[SPRING] = !toggles[SPRING];
+  }
+  if (key == '3') {
     toggles[DRAGF] = !toggles[DRAGF];
   }
-}
+  if (key == '4') {
+    toggles[ELECTROSTATIC] = !toggles[ELECTROSTATIC];
+  }
+  if (key == '5') {
+    toggles[COMBINATION] = !toggles[COMBINATION];
+  }
+}//keyPressed
 
 
 void displayMode()
