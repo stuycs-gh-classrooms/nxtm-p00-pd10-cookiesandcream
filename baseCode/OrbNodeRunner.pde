@@ -11,20 +11,27 @@ float V_INITIAL = 5;
 int SPRING_LENGTH = 50;
 float  SPRING_K = 0.005;
 
+//Toggles
 int MOVING = 0;
-int GRAVITY = 1;
-int SPRING = 2;
-int DRAGF = 3;
-int ELECTROSTATIC = 4;
-int COMBINATION = 5;
-int BOUNCE = 6;
+int BOUNCE = 1;
 
-boolean[] toggles = new boolean[7];
-String[] modes = {"Moving", "Gravity", "Spring", "Drag", "Electrostatic",
-  "Combination", "Bounce"};
+//Simulations
+int GRAVITY = 2;
+int SPRING = 3;
+int DRAGF = 4;
+int ELECTROSTATIC = 5;
+int COMBINATION = 6;
+int sim = GRAVITY; //default simulation
 
+//Toggles
+boolean[] toggles = new boolean[6];
+String[] mode = {"Moving", "Bounce", "Gravity", "Spring", "Drag", "Electrostatic"};
+
+//Array
 FixedOrb star;
 Orb[] orbs;
+
+//Linked list
 OrbNode o0, o1, o2;
 
 
@@ -34,22 +41,26 @@ void setup()
   orbs = new Orb[NUM_ORBS];
 
   //Simulations
-  gravitySetup(V_INITIAL);
+  if (sim == GRAVITY) {
+    gravitySetup(V_INITIAL);
+  }
 }//setup
 
 
 void draw()
 {
   background(255);
-  displayMode();
+  displayToggle();
 
   //Array
   for (int i = 0; i < orbs.length; i++) {
     orbs[i].display();
   }
-  
-  gravitySim();
 
+  if (toggles[MOVING]) {
+    gravitySim();
+  }
+  
   //Linked list
   OrbNode currentNode = o0;
   while (currentNode != null) {
@@ -74,48 +85,47 @@ void keyPressed()
     toggles[BOUNCE] = !toggles[BOUNCE];
   }
   if (key == '1') {
-    toggles[GRAVITY] = !toggles[GRAVITY];
+    sim = GRAVITY;
   }
   if (key == '2') {
-    toggles[SPRING] = !toggles[SPRING];
+    sim = SPRING;
   }
   if (key == '3') {
-    toggles[DRAGF] = !toggles[DRAGF];
+    sim = DRAGF;
   }
   if (key == '4') {
-    toggles[ELECTROSTATIC] = !toggles[ELECTROSTATIC];
+    sim = ELECTROSTATIC;
   }
   if (key == '5') {
-    toggles[COMBINATION] = !toggles[COMBINATION];
+    sim = COMBINATION;
   }
 }//keyPressed
 
 
-void displayMode()
+void displayToggle()
 {
   textAlign(LEFT, TOP);
   textSize(20);
   noStroke();
-  int spacing = 85;
   int x = 0;
 
   for (int m=0; m<toggles.length; m++) {
     //set box color
-    if (toggles[m]) {
+    if (toggles[m] || sim == m) {
       fill(0, 255, 0);
     } else {
       fill(255, 0, 0);
     }
 
-    float w = textWidth(modes[m]);
+    float w = textWidth(mode[m]);
     rect(x, 0, w+5, 20);
     fill(0);
-    text(modes[m], x+2, 2);
+    text(mode[m], x+2, 2);
     x+= w+5;
   }
 }//displayMode
 
-void gravitySetup(float v) {
+void gravitySetup(float vi) {
   star = new FixedOrb(width/2, height/2, 200, 100);
   orbs[0] = star;
 
@@ -125,9 +135,10 @@ void gravitySetup(float v) {
   }
 
   for (int i = 1; i < orbs.length; i++) {
+    //randomize the direction of initial v
     float deg = random(0, 360);
-    float vx =  v * cos(radians(deg));
-    float vy = v * cos(radians(deg));
+    float vx =  vi * cos(radians(deg));
+    float vy = vi * cos(radians(deg));
     PVector vel = new PVector(vx, vy);
     orbs[i].velocity = vel;
   }
