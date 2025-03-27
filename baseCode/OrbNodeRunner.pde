@@ -6,8 +6,8 @@ float MAX_MASS = 100;
 float G_CONSTANT = 1;
 float K_CONSTANT = 1;
 float D_COEF_AIR = 0.1;
-float D_COEF_WATER = 0.3;
-float D_COEF_HONEY = 0.7;
+float D_COEF_WATER = 0.4;
+float D_COEF_HONEY = 0.9;
 float V_INITIAL = 5;
 
 int SPRING_LENGTH = 50;
@@ -57,7 +57,13 @@ void draw()
 {
   background(255);
   displayToggle();
-
+  if (sim == DRAGF) {
+    fill(0, 256, 0);
+    rect(0, 30, width/2, height/2-30);
+    fill(150, 75, 0);
+    rect(width/2, height/2, width/2, height/2);
+  }
+  
   //Array
   if (sim == GRAVITY || sim == DRAGF) {
     for (int i = 0; i < orbs.length; i++) {
@@ -75,6 +81,9 @@ void draw()
     }
     if (sim == SPRING) {
       springSim();
+    }
+    if (sim == DRAGF){
+      dragSim();
     }
   }
 
@@ -150,10 +159,6 @@ void listSetup(float vi) {
     f = 1;
   }
   if (sim == DRAGF) {
-    fill(0, 256, 0);
-    rect(0, width/2, 0, height/2);
-    fill(150, 75, 0);
-    rect(width/2, width, height/2, height);
     f = 0;
   }
 
@@ -190,8 +195,29 @@ void springSim() {
 }//springSim
 
 
-//void dragSim() {
-//  for (int i = 0; i < orbs.length; i++){
-//    PVector df = orbs[i].getDragForce();
-//  }
-//}//dragSim
+void dragSim() {
+  float D_COEF = 0;
+  for (int i = 0; i < orbs.length; i++){
+    if (orbs[i].center.x > 0 && 
+        orbs[i].center.x < width/2 &&
+        orbs[i].center.y > 30 &&
+        orbs[i].center.y < height/2){
+          D_COEF = D_COEF_WATER;
+        }
+    if (orbs[i].center.x > width/2 && 
+        orbs[i].center.x < width &&
+        orbs[i].center.y > height/2 &&
+        orbs[i].center.y < height){
+          D_COEF = D_COEF_HONEY;
+        }
+    else{
+      D_COEF = D_COEF_AIR;
+    }
+    println(D_COEF);
+    PVector df = orbs[i].getDragForce(D_COEF);
+    orbs[i].applyForce(df);
+  }
+  for (int i = 1; i < orbs.length; i++) {
+    orbs[i].move(toggles[BOUNCE]);
+  }
+}//dragSim
