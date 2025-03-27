@@ -20,14 +20,22 @@ class OrbList {
     while (front != null) {
       removeFront();
     }
+
     float x = width/(NUM_ORBS+1);
     for (int i = 0; i < n; i++) {
       OrbNode o = new OrbNode();
+
+      float deg = random(0, 360);
+      float vx =  V_INITIAL * cos(radians(deg));
+      float vy = V_INITIAL * cos(radians(deg));
+      o.velocity = new PVector(vx, vy);
+
       if (ordered) {
         o.center.x = x;
         x+= width/(NUM_ORBS+1);
         o.center.y = height/2;
       }
+
       addFront(o);
       //println(o);
       //println(o.center.x, o.center.y);
@@ -67,7 +75,7 @@ class OrbList {
 
   void run(boolean bounce) {
     //println("run function is called");
-    
+
     OrbNode currentOrb = front;
     //println(currentOrb);
     while (currentOrb != null) {
