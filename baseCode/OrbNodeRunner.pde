@@ -5,7 +5,9 @@ float MIN_MASS = 10;
 float MAX_MASS = 100;
 float G_CONSTANT = 1;
 float K_CONSTANT = 1;
-float D_COEF = 0.1;
+float D_COEF_AIR = 0.1;
+float D_COEF_WATER = 0.4;
+float D_COEF_HONEY = 0.9;
 float V_INITIAL = 5;
 
 int SPRING_LENGTH = 50;
@@ -42,10 +44,9 @@ void setup()
   orbs = new Orb[NUM_ORBS];
 
   //Simulations
-  if (sim == GRAVITY) {
-    gravitySetup(V_INITIAL);
+  if (sim == GRAVITY || sim == DRAGF) {
+    listSetup(V_INITIAL);
   }
-  
   //LINKED LIST
   slinky = new OrbList();
   slinky.populate(NUM_ORBS, true);
@@ -56,24 +57,33 @@ void draw()
 {
   background(255);
   displayToggle();
+  if (sim == DRAGF) {
+    fill(0, 256, 0);
+    rect(0, 30, width/2, height/2-30);
+    fill(150, 75, 0);
+    rect(width/2, height/2, width/2, height/2);
+  }
 
   //Array
-  if (sim == GRAVITY) {
+  if (sim == GRAVITY || sim == DRAGF) {
     for (int i = 0; i < orbs.length; i++) {
       orbs[i].display();
     }
   }
-  if(sim == SPRING){
+  if (sim == SPRING) {
     //println("sim is correct");
     slinky.display();
   }
 
   if (toggles[MOVING]) {
-    if (sim == GRAVITY){
-    gravitySim();
+    if (sim == GRAVITY) {
+      gravitySim();
     }
-    if (sim == SPRING){
+    if (sim == SPRING) {
       springSim();
+    }
+    if (sim == DRAGF) {
+      dragSim();
     }
   }
 
@@ -91,8 +101,6 @@ void draw()
   }
 }//draw
 
-void mousePressed() {
-}
 
 void keyPressed()
 {
@@ -119,6 +127,42 @@ void keyPressed()
   }
 }//keyPressed
 
+void mousePressed() {
+  int x = 0; // Starting position for buttons
+  for (int m = 2; m < toggles.length; m++) { // Start with simulation buttons on the left
+    float w = textWidth(mode[m]);
+    if (mouseX > x && mouseX < x + w + 5 && mouseY > 0 && mouseY < 20) { // Increment based on wordlength
+      // Change simulation mode based on button clicked
+      if (m == GRAVITY) {
+        sim = GRAVITY;
+      } else if (m == SPRING) {
+        sim = SPRING;
+      } else if (m == DRAGF) {
+        sim = DRAGF;
+      } else if (m == ELECTROSTATIC) {
+        sim = ELECTROSTATIC;
+      } else if (m == COMBINATION) {
+        sim = COMBINATION;
+      }
+    } //mouse boolean
+    x += w + 5;  // Move x position for next button
+  } //for
+
+  x = width - 2; // Move to the far right for the last two buttons
+  for (int m = 0; m < 2; m++) {
+    float w = textWidth(mode[m]);  // Get width of button
+
+    // Check if the mouse press is within the button's area
+    if (mouseX > x - w && mouseX < x && mouseY > 0 && mouseY < 20) {
+      if (m == MOVING || m == BOUNCE) {
+        toggles[m] = !toggles[m];  // Toggle the state of the button
+      }
+    }
+
+    x -= w + 5;  // Update x position for next button
+  }//for loop
+}//mousePressed
+
 
 void displayToggle()
 {
@@ -141,8 +185,7 @@ void displayToggle()
     text(mode[m], x+2, 2);
     x+= w+5;
   }
-  
-  x = 0;
+  x = width - 2; // Move it away from the side wall
   for (int m=0; m<2; m++) {
     //set box color
     if (toggles[m] || sim == m) {
@@ -152,23 +195,30 @@ void displayToggle()
     }
 
     float w = textWidth(mode[m]);
-    rect(x, 25, w+5, 20);
+    rect(x-w, 0, w+5, 20);
     fill(0);
-    text(mode[m], x+2, 27);
-    x+= w+5;
+    text(mode[m], x+2-w, 2);
+    x -= w+5;
   }
 }//displayMode
 
-void gravitySetup(float vi) {
-  star = new FixedOrb(width/2, height/2, 200, 100);
-  orbs[0] = star;
+void listSetup(float vi) {
+  int f = 0;
+  if (sim == GRAVITY) {
+    star = new FixedOrb(width/2, height/2, 200, 100);
+    orbs[0] = star;
+    f = 1;
+  }
+  if (sim == DRAGF) {
+    f = 0;
+  }
 
   //populate
-  for (int i = 1; i < orbs.length; i++) {
+  for (int i = f; i < orbs.length; i++) {
     orbs[i] = new Orb();
   }
 
-  for (int i = 1; i < orbs.length; i++) {
+  for (int i = f; i < orbs.length; i++) {
     //randomize the direction of initial v
     float deg = random(0, 360);
     float vx =  vi * cos(radians(deg));
@@ -189,8 +239,35 @@ void gravitySim() {
   }
 }//gravitySim
 
-void springSim(){
+void springSim() {
   //println("springSim running");
-   slinky.applySprings(SPRING_LENGTH, SPRING_K);
-   slinky.run(toggles[BOUNCE]);
+  slinky.applySprings(SPRING_LENGTH, SPRING_K);
+  slinky.run(toggles[BOUNCE]);
 }//springSim
+
+
+void dragSim() {
+  float D_COEF = 0;
+  for (int i = 0; i < orbs.length; i++) {
+    if (orbs[i].center.x > 0 &&
+      orbs[i].center.x < width/2 &&
+      orbs[i].center.y > 30 &&
+      orbs[i].center.y < height/2) {
+      D_COEF = D_COEF_WATER;
+    }
+    if (orbs[i].center.x > width/2 &&
+      orbs[i].center.x < width &&
+      orbs[i].center.y > height/2 &&
+      orbs[i].center.y < height) {
+      D_COEF = D_COEF_HONEY;
+    } else {
+      D_COEF = D_COEF_AIR;
+    }
+    println(D_COEF);
+    PVector df = orbs[i].getDragForce(D_COEF);
+    orbs[i].applyForce(df);
+  }
+  for (int i = 1; i < orbs.length; i++) {
+    orbs[i].move(toggles[BOUNCE]);
+  }
+}//dragSim
