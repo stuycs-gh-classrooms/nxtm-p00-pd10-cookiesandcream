@@ -5,7 +5,9 @@ float MIN_MASS = 10;
 float MAX_MASS = 100;
 float G_CONSTANT = 1;
 float K_CONSTANT = 1;
-float D_COEF = 0.1;
+float D_COEF_AIR = 0.1;
+float D_COEF_WATER = 0.3;
+float D_COEF_HONEY = 0.7;
 float V_INITIAL = 5;
 
 int SPRING_LENGTH = 50;
@@ -42,8 +44,8 @@ void setup()
   orbs = new Orb[NUM_ORBS];
 
   //Simulations
-  if (sim == GRAVITY) {
-    gravitySetup(V_INITIAL);
+  if (sim == GRAVITY || sim == DRAGF) {
+    listSetup(V_INITIAL);
   }
   //LINKED LIST
   slinky = new OrbList();
@@ -57,21 +59,21 @@ void draw()
   displayToggle();
 
   //Array
-  if (sim == GRAVITY) {
+  if (sim == GRAVITY || sim == DRAGF) {
     for (int i = 0; i < orbs.length; i++) {
       orbs[i].display();
     }
   }
-  if(sim == SPRING){
+  if (sim == SPRING) {
     //println("sim is correct");
     slinky.display();
   }
 
   if (toggles[MOVING]) {
-    if (sim == GRAVITY){
-    gravitySim();
+    if (sim == GRAVITY) {
+      gravitySim();
     }
-    if (sim == SPRING){
+    if (sim == SPRING) {
       springSim();
     }
   }
@@ -140,16 +142,27 @@ void displayToggle()
   }
 }//displayMode
 
-void gravitySetup(float vi) {
-  star = new FixedOrb(width/2, height/2, 200, 100);
-  orbs[0] = star;
+void listSetup(float vi) {
+  int f = 0;
+  if (sim == GRAVITY) {
+    star = new FixedOrb(width/2, height/2, 200, 100);
+    orbs[0] = star;
+    f = 1;
+  }
+  if (sim == DRAGF) {
+    fill(0, 256, 0);
+    rect(0, width/2, 0, height/2);
+    fill(150, 75, 0);
+    rect(width/2, width, height/2, height);
+    f = 0;
+  }
 
   //populate
-  for (int i = 1; i < orbs.length; i++) {
+  for (int i = f; i < orbs.length; i++) {
     orbs[i] = new Orb();
   }
 
-  for (int i = 1; i < orbs.length; i++) {
+  for (int i = f; i < orbs.length; i++) {
     //randomize the direction of initial v
     float deg = random(0, 360);
     float vx =  vi * cos(radians(deg));
@@ -170,8 +183,15 @@ void gravitySim() {
   }
 }//gravitySim
 
-void springSim(){
+void springSim() {
   //println("springSim running");
-   slinky.applySprings(SPRING_LENGTH, SPRING_K);
-   slinky.run(toggles[BOUNCE]);
+  slinky.applySprings(SPRING_LENGTH, SPRING_K);
+  slinky.run(toggles[BOUNCE]);
 }//springSim
+
+
+//void dragSim() {
+//  for (int i = 0; i < orbs.length; i++){
+//    PVector df = orbs[i].getDragForce();
+//  }
+//}//dragSim
