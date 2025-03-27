@@ -7,7 +7,7 @@ class OrbNode extends Orb
 void display(int springLength)
   {
     super.display();
-
+    //println("displaying");
     // Draw line to the next OrbNode
     if (next != null) {
       float dist = center.dist(next.center);
@@ -34,7 +34,6 @@ void display(int springLength)
       line(center.x + 2.5, center.y + 2.5, previous.center.x + 2.5, previous.center.y + 2.5);
     }
   }
-
 
 
   // Apply spring force to next and previous nodes

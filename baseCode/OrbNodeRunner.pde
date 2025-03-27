@@ -33,6 +33,7 @@ Orb[] orbs;
 
 //Linked list
 OrbNode o0, o1, o2;
+OrbList slinky;
 
 
 void setup()
@@ -44,6 +45,9 @@ void setup()
   if (sim == GRAVITY) {
     gravitySetup(V_INITIAL);
   }
+  //LINKED LIST
+  slinky = new OrbList();
+  slinky.populate(NUM_ORBS, true);
 }//setup
 
 
@@ -53,14 +57,25 @@ void draw()
   displayToggle();
 
   //Array
-  for (int i = 0; i < orbs.length; i++) {
-    orbs[i].display();
+  if (sim == GRAVITY) {
+    for (int i = 0; i < orbs.length; i++) {
+      orbs[i].display();
+    }
+  }
+  if(sim == SPRING){
+    //println("sim is correct");
+    slinky.display();
   }
 
   if (toggles[MOVING]) {
+    if (sim == GRAVITY){
     gravitySim();
+    }
+    if (sim == SPRING){
+      springSim();
+    }
   }
-  
+
   //Linked list
   OrbNode currentNode = o0;
   while (currentNode != null) {
@@ -154,3 +169,9 @@ void gravitySim() {
     orbs[i].move(toggles[BOUNCE]);
   }
 }//gravitySim
+
+void springSim(){
+  //println("springSim running");
+   slinky.applySprings(SPRING_LENGTH, SPRING_K);
+   slinky.run(toggles[BOUNCE]);
+}//springSim
