@@ -63,7 +63,11 @@ void draw()
     fill(150, 75, 0);
     rect(width/2, height/2, width/2, height/2);
   }
+<<<<<<< HEAD
   
+=======
+
+>>>>>>> ec16facc2c8bd5c16c2d9198a96686e1e083a000
   //Array
   if (sim == GRAVITY || sim == DRAGF) {
     for (int i = 0; i < orbs.length; i++) {
@@ -82,7 +86,11 @@ void draw()
     if (sim == SPRING) {
       springSim();
     }
+<<<<<<< HEAD
     if (sim == DRAGF){
+=======
+    if (sim == DRAGF) {
+>>>>>>> ec16facc2c8bd5c16c2d9198a96686e1e083a000
       dragSim();
     }
   }
@@ -127,6 +135,42 @@ void keyPressed()
   }
 }//keyPressed
 
+void mousePressed() {
+  int x = 0; // Starting position for buttons
+  for (int m = 2; m < toggles.length; m++) { // Start with simulation buttons on the left
+    float w = textWidth(mode[m]);
+    if (mouseX > x && mouseX < x + w + 5 && mouseY > 0 && mouseY < 20) { // Increment based on wordlength
+      // Change simulation mode based on button clicked
+      if (m == GRAVITY) {
+        sim = GRAVITY;
+      } else if (m == SPRING) {
+        sim = SPRING;
+      } else if (m == DRAGF) {
+        sim = DRAGF;
+      } else if (m == ELECTROSTATIC) {
+        sim = ELECTROSTATIC;
+      } else if (m == COMBINATION) {
+        sim = COMBINATION;
+      }
+    } //mouse boolean
+    x += w + 5;  // Move x position for next button
+  } //for
+
+  x = width - 2; // Move to the far right for the last two buttons
+  for (int m = 0; m < 2; m++) {
+    float w = textWidth(mode[m]);  // Get width of button
+
+    // Check if the mouse press is within the button's area
+    if (mouseX > x - w && mouseX < x && mouseY > 0 && mouseY < 20) {
+      if (m == MOVING || m == BOUNCE) {
+        toggles[m] = !toggles[m];  // Toggle the state of the button
+      }
+    }
+
+    x -= w + 5;  // Update x position for next button
+  }//for loop
+}//mousePressed
+
 
 void displayToggle()
 {
@@ -135,7 +179,7 @@ void displayToggle()
   noStroke();
   int x = 0;
 
-  for (int m=0; m<toggles.length; m++) {
+  for (int m=2; m<toggles.length; m++) {
     //set box color
     if (toggles[m] || sim == m) {
       fill(0, 255, 0);
@@ -148,6 +192,21 @@ void displayToggle()
     fill(0);
     text(mode[m], x+2, 2);
     x+= w+5;
+  }
+  x = width - 2; // Move it away from the side wall
+  for (int m=0; m<2; m++) {
+    //set box color
+    if (toggles[m] || sim == m) {
+      fill(0, 255, 0);
+    } else {
+      fill(255, 0, 0);
+    }
+
+    float w = textWidth(mode[m]);
+    rect(x-w, 0, w+5, 20);
+    fill(0);
+    text(mode[m], x+2-w, 2);
+    x -= w+5;
   }
 }//displayMode
 
@@ -197,6 +256,7 @@ void springSim() {
 
 void dragSim() {
   float D_COEF = 0;
+<<<<<<< HEAD
   for (int i = 0; i < orbs.length; i++){
     if (orbs[i].center.x > 0 && 
         orbs[i].center.x < width/2 &&
@@ -211,6 +271,21 @@ void dragSim() {
           D_COEF = D_COEF_HONEY;
         }
     else{
+=======
+  for (int i = 0; i < orbs.length; i++) {
+    if (orbs[i].center.x > 0 &&
+      orbs[i].center.x < width/2 &&
+      orbs[i].center.y > 30 &&
+      orbs[i].center.y < height/2) {
+      D_COEF = D_COEF_WATER;
+    }
+    if (orbs[i].center.x > width/2 &&
+      orbs[i].center.x < width &&
+      orbs[i].center.y > height/2 &&
+      orbs[i].center.y < height) {
+      D_COEF = D_COEF_HONEY;
+    } else {
+>>>>>>> ec16facc2c8bd5c16c2d9198a96686e1e083a000
       D_COEF = D_COEF_AIR;
     }
     println(D_COEF);
