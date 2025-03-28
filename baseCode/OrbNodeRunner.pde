@@ -45,7 +45,7 @@ void setup()
   orbs = new Orb[NUM_ORBS];
 
   //Simulations
-  if (sim == GRAVITY || sim == DRAGF) {
+  if (sim == GRAVITY || sim == DRAGF || sim == ELECTROSTATIC) {
     listSetup(V_INITIAL);
   }
   //LINKED LIST
@@ -58,38 +58,53 @@ void draw()
 {
   background(255);
   displayToggle();
-  if (prevSim != sim){
-    if (sim == GRAVITY || sim == DRAGF){
+  if (prevSim != sim) {
+    if (sim == GRAVITY || sim == DRAGF) {
       listSetup(V_INITIAL);
+    } else if (sim == ELECTROSTATIC) {
+      listSetup(0);
     }
     prevSim = sim;
   }
+
   if (sim == DRAGF) {
     fill(0, 256, 0);
     rect(0, 30, width/2, height/2-30);
     fill(150, 75, 0);
     rect(width/2, height/2, width/2, height/2);
   }
+
   //Array
-  if (sim == GRAVITY || sim == DRAGF) {
+  if (sim == GRAVITY || sim == DRAGF || sim == ELECTROSTATIC) {
     for (int i = 0; i < orbs.length; i++) {
       orbs[i].display();
     }
   }
+
   if (sim == SPRING) {
     //println("sim is correct");
     slinky.display();
+  }
+  
+  if (sim == ELECTROSTATIC) {
+    chargeDisplay();
   }
 
   if (toggles[MOVING]) {
     if (sim == GRAVITY) {
       gravitySim();
     }
+
     if (sim == SPRING) {
       springSim();
     }
-    if (sim == DRAGF){
+
+    if (sim == DRAGF) {
       dragSim();
+    }
+
+    if (sim == ELECTROSTATIC) {
+      electroSim();
     }
   }
 
@@ -209,22 +224,22 @@ void displayToggle()
 }//displayMode
 
 void listSetup(float vi) {
-  int f = 0;
+  int first = 0;
   if (sim == GRAVITY) {
-    star = new FixedOrb(width/2, height/2, 200, 100);
+    star = new FixedOrb(width/2, height/2, 200, 100, 0);
     orbs[0] = star;
-    f = 1;
+    first = 1;
   }
-  if (sim == DRAGF) {
-    f = 0;
+  if (sim == DRAGF || sim == ELECTROSTATIC) {
+    first = 0;
   }
 
   //populate
-  for (int i = f; i < orbs.length; i++) {
+  for (int i = first; i < orbs.length; i++) {
     orbs[i] = new Orb();
   }
 
-  for (int i = f; i < orbs.length; i++) {
+  for (int i = first; i < orbs.length; i++) {
     //randomize the direction of initial v
     float deg = random(0, 360);
     float vx =  vi * cos(radians(deg));
@@ -233,6 +248,21 @@ void listSetup(float vi) {
     orbs[i].velocity = vel;
   }
   //println(orbs[0].center);
+
+  //set color to indicate charges
+  if (sim == ELECTROSTATIC) {
+    for (int i = 0; i < orbs.length; i++) {
+      if (orbs[i].charge > 0) {
+        orbs[i].c = color(255, 0, 0);
+        fill(0, 0, 0);
+        text("+", orbs[i].center.x, orbs[i].center.y);
+      } else if (orbs[i].charge < 0) {
+        orbs[i].c = color (0, 0, 255);
+        fill(0, 0, 0);
+        text("-", orbs[i].center.x, orbs[i].center.y);
+      }
+    }
+  }
 }//gravitySetup
 
 void gravitySim() {
@@ -255,27 +285,56 @@ void springSim() {
 
 void dragSim() {
   float D_COEF = 0;
-  for (int i = 0; i < orbs.length; i++){
-    if (orbs[i].center.x > 0 && 
-        orbs[i].center.x < width/2 &&
-        orbs[i].center.y > 30 &&
-        orbs[i].center.y < height/2){
-          D_COEF = D_COEF_WATER;
-        }
-    if (orbs[i].center.x > width/2 && 
-        orbs[i].center.x < width &&
-        orbs[i].center.y > height/2 &&
-        orbs[i].center.y < height){
-          D_COEF = D_COEF_HONEY;
-        }
-    else{
+  for (int i = 0; i < orbs.length; i++) {
+    if (orbs[i].center.x > 0 &&
+      orbs[i].center.x < width/2 &&
+      orbs[i].center.y > 30 &&
+      orbs[i].center.y < height/2) {
+      D_COEF = D_COEF_WATER;
+    }
+    if (orbs[i].center.x > width/2 &&
+      orbs[i].center.x < width &&
+      orbs[i].center.y > height/2 &&
+      orbs[i].center.y < height) {
+      D_COEF = D_COEF_HONEY;
+    } else {
       D_COEF = D_COEF_AIR;
     }
     //println(D_COEF);
     PVector df = orbs[i].getDragForce(D_COEF);
     orbs[i].applyForce(df);
   }
-  for (int i = 1; i < orbs.length; i++) {
+
+  for (int i = 0; i < orbs.length; i++) {
     orbs[i].move(toggles[BOUNCE]);
   }
 }//dragSim
+
+void chargeDisplay() {
+  fill(0, 0, 0);
+  textSize(30);
+  textAlign(CENTER, CENTER);
+  for (int i = 0; i < orbs.length; i++) {
+    if (orbs[i].charge > 0) {
+      text("+", orbs[i].center.x, orbs[i].center.y);
+    } else if (orbs[i].charge < 0) {
+      text("-", orbs[i].center.x, orbs[i].center.y);
+    }
+  }
+}
+
+void electroSim() {
+
+  for (int i = 0; i < orbs.length; i++) {
+    for (int j = 0; j < orbs.length; j++) {
+      if (i != j) { //avoid calculating focrce with itself
+        PVector ef = orbs[i].getElectro(orbs[j], K_CONSTANT);
+        orbs[i].applyForce(ef);
+      }
+    }
+  }
+
+  for (int i = 0; i < orbs.length; i++) {
+    orbs[i].move(toggles[BOUNCE]);
+  }
+}//electroSim

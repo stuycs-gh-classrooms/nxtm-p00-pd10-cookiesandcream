@@ -7,6 +7,7 @@ class Orb
   PVector acceleration;
   float bsize;
   float mass;
+  float charge;
   color c;
 
 
@@ -17,16 +18,18 @@ class Orb
     float y = random(bsize/2, height-bsize/2);
     center = new PVector(x, y);
     mass = random(10, 100);
+    charge = random(-100, 100);
     velocity = new PVector();
     acceleration = new PVector();
     setColor();
   }
 
 
-  Orb(float x, float y, float s, float m)
+  Orb(float x, float y, float s, float m, float ch)
   {
     bsize = s;
     mass = m;
+    charge = ch;
     center = new PVector(x, y);
     velocity = new PVector();
     acceleration = new PVector();
@@ -92,6 +95,21 @@ class Orb
 
     return direction;
   }//getSpring
+
+  PVector getElectro(Orb other, float electroK) {
+    float dist = max(center.dist(other.center), MIN_SIZE);
+    float mag = electroK * charge * other.charge / sq(dist);
+    PVector force = other.center.copy();
+    force.sub(center);
+    force.normalize();
+    force.mult(mag);
+
+    if (charge * other.charge > 0) {
+      force.mult(-1);
+    }
+
+    return force;
+  }
 
   boolean yBounce() {
     if (center.y > height - bsize/2) {
