@@ -6,8 +6,8 @@ float MAX_MASS = 100;
 float G_CONSTANT = 1;
 float K_CONSTANT = 1;
 float D_COEF_AIR = 0.1;
-float D_COEF_WATER = 0.4;
-float D_COEF_HONEY = 0.9;
+float D_COEF_WATER = 0.3;
+float D_COEF_HONEY = 0.7;
 float V_INITIAL = 5;
 
 int SPRING_LENGTH = 50;
@@ -24,6 +24,7 @@ int DRAGF = 4;
 int ELECTROSTATIC = 5;
 int COMBINATION = 6;
 int sim = GRAVITY; //default simulation
+int prevSim = GRAVITY;
 
 //Toggles
 boolean[] toggles = new boolean[6];
@@ -57,17 +58,18 @@ void draw()
 {
   background(255);
   displayToggle();
+  if (prevSim != sim){
+    if (sim == GRAVITY || sim == DRAGF){
+      listSetup(V_INITIAL);
+    }
+    prevSim = sim;
+  }
   if (sim == DRAGF) {
     fill(0, 256, 0);
     rect(0, 30, width/2, height/2-30);
     fill(150, 75, 0);
     rect(width/2, height/2, width/2, height/2);
   }
-<<<<<<< HEAD
-  
-=======
-
->>>>>>> ec16facc2c8bd5c16c2d9198a96686e1e083a000
   //Array
   if (sim == GRAVITY || sim == DRAGF) {
     for (int i = 0; i < orbs.length; i++) {
@@ -86,11 +88,7 @@ void draw()
     if (sim == SPRING) {
       springSim();
     }
-<<<<<<< HEAD
     if (sim == DRAGF){
-=======
-    if (sim == DRAGF) {
->>>>>>> ec16facc2c8bd5c16c2d9198a96686e1e083a000
       dragSim();
     }
   }
@@ -234,6 +232,7 @@ void listSetup(float vi) {
     PVector vel = new PVector(vx, vy);
     orbs[i].velocity = vel;
   }
+  //println(orbs[0].center);
 }//gravitySetup
 
 void gravitySim() {
@@ -256,7 +255,6 @@ void springSim() {
 
 void dragSim() {
   float D_COEF = 0;
-<<<<<<< HEAD
   for (int i = 0; i < orbs.length; i++){
     if (orbs[i].center.x > 0 && 
         orbs[i].center.x < width/2 &&
@@ -271,24 +269,9 @@ void dragSim() {
           D_COEF = D_COEF_HONEY;
         }
     else{
-=======
-  for (int i = 0; i < orbs.length; i++) {
-    if (orbs[i].center.x > 0 &&
-      orbs[i].center.x < width/2 &&
-      orbs[i].center.y > 30 &&
-      orbs[i].center.y < height/2) {
-      D_COEF = D_COEF_WATER;
-    }
-    if (orbs[i].center.x > width/2 &&
-      orbs[i].center.x < width &&
-      orbs[i].center.y > height/2 &&
-      orbs[i].center.y < height) {
-      D_COEF = D_COEF_HONEY;
-    } else {
->>>>>>> ec16facc2c8bd5c16c2d9198a96686e1e083a000
       D_COEF = D_COEF_AIR;
     }
-    println(D_COEF);
+    //println(D_COEF);
     PVector df = orbs[i].getDragForce(D_COEF);
     orbs[i].applyForce(df);
   }
