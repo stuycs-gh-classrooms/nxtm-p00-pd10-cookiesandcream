@@ -68,7 +68,7 @@ void draw()
   }
 
   if (sim == DRAGF || sim == COMBINATION) {
-    fill(0, 256, 0);
+    fill(86, 237, 228);
     rect(0, 30, width/2, height/2-30);
     fill(150, 75, 0);
     rect(width/2, height/2, width/2, height/2);
@@ -88,6 +88,10 @@ void draw()
 
   if (sim == ELECTROSTATIC || sim == COMBINATION) {
     chargeDisplay();
+  }
+
+  if (sim == COMBINATION) {
+    displayCombination();
   }
 
   if (toggles[MOVING]) {
@@ -154,7 +158,7 @@ void keyPressed()
 
 void mousePressed() {
   float x = 0; // Starting position for buttons(left side of button
-  for (int m = 2; m < toggles.length; m++) { // Start with simulation buttons on the left
+  for (int m = GRAVITY; m < toggles.length; m++) { // Start with simulation buttons on the left
     float w = textWidth(mode[m]); //for current one
     if (mouseX > x && mouseX < x + w && mouseY > 0 && mouseY < 20) { // Increment based on wordlength
       // Change simulation mode based on button clicked
@@ -343,16 +347,8 @@ void electroSim() {
   }
 }//electroSim
 
-void combinationSim() {
-  electroSim();  // Apply electrostatic forces
-  chargeDisplay();  // Display charges
-
-
+void displayCombination() {
   for (int i = 1; i < orbs.length - 1; i++) {  // Loop until the second-to-last orb
-    // Apply the spring force between adjacent orbs
-    PVector springForce = orbs[i].getSpring(orbs[i + 1], SPRING_LENGTH, SPRING_K/2); // Halved to balance forces, prevent it from dominating
-    orbs[i].applyForce(springForce);
-    orbs[i + 1].applyForce(springForce.mult(-1));
     //lines and color
     float dist = orbs[i].center.dist(orbs[i+1].center);
     if (dist > SPRING_LENGTH) {
@@ -360,10 +356,22 @@ void combinationSim() {
     } else if (dist < SPRING_LENGTH) {
       stroke(255, 0, 0); // Compressed (red)
     } else {
-      stroke(0, 0, 255); // Neutral (blue)
+      stroke(0, 0, 0); // Neutral (black)
     }
     line(orbs[i].center.x + 4, orbs[i].center.y + 4, orbs[i+1].center.x, orbs[i+1].center.y);
     line(orbs[orbs.length - i].center.x - 4, orbs[orbs.length - i].center.y - 4, orbs[orbs.length - i - 1].center.x, orbs[orbs.length - i - 1].center.y);
+  }
+}
+
+void combinationSim() {
+  electroSim();  // Apply electrostatic forces
+
+  for (int i = 1; i < orbs.length - 1; i++) {  // Loop until the second-to-last orb
+    // Apply the spring force between adjacent orbs
+    PVector springForce = orbs[i].getSpring(orbs[i + 1], SPRING_LENGTH, SPRING_K); // Halved to balance forces, prevent it from dominating
+    orbs[i].applyForce(springForce);
+    orbs[i + 1].applyForce(springForce.mult(-1));
+    //lines and color
   }
   float D_COEF = 0;
   for (int i = 0; i < orbs.length; i++) {

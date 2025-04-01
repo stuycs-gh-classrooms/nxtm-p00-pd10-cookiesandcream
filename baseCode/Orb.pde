@@ -98,7 +98,7 @@ class Orb
 
   PVector getElectro(Orb other, float electroK) {
     float dist = max(center.dist(other.center), MIN_SIZE);
-    float mag = electroK * charge * other.charge / sq(dist);
+    float mag = abs(electroK * charge * other.charge / sq(dist));
     PVector force = other.center.copy();
     force.sub(center);
     force.normalize();
