@@ -156,43 +156,6 @@ void keyPressed()
   }
 }//keyPressed
 
-void mousePressed() {
-  float x = 0; // Starting position for buttons(left side of button
-  for (int m = GRAVITY; m < toggles.length; m++) { // Start with simulation buttons on the left
-    float w = textWidth(mode[m]); //for current one
-    if (mouseX > x && mouseX < x + w && mouseY > 0 && mouseY < 20) { // Increment based on wordlength
-      // Change simulation mode based on button clicked
-      if (m == GRAVITY) {
-        sim = GRAVITY;
-      } else if (m == SPRING) {
-        sim = SPRING;
-      } else if (m == DRAGF) {
-        sim = DRAGF;
-      } else if (m == ELECTROSTATIC) {
-        sim = ELECTROSTATIC;
-      } else if (m == COMBINATION) {
-        sim = COMBINATION; // Button doesn't work very well. The calculation process is hard because not uniform button lengths, I tried to fix it but didn
-      }
-    } //mouse boolean
-    x += w;  // Move x position for next button
-  } //for
-
-  x = width - 2; // Move to the far right for the last two buttons
-  for (int m = 0; m < 2; m++) {
-    float w = textWidth(mode[m]);  // Get width of button
-
-    // Check if the mouse press is within the button's area
-    if (mouseX > x - w && mouseX < x && mouseY > 0 && mouseY < 20) {
-      if (m == MOVING || m == BOUNCE) {
-        toggles[m] = !toggles[m];  // Toggle the state of the button
-      }
-    }
-
-    x -= w + 5;  // Update x position for next button
-  }//for loop
-}//mousePressed
-
-
 void displayToggle()
 {
   textAlign(LEFT, TOP);
